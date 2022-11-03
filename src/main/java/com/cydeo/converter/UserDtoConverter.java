@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 //@ConfigurationPropertiesBinding
 public class UserDtoConverter implements Converter<String, UserDTO> {
 
+
     UserService userService;
 
     public UserDtoConverter(UserService userService) {
@@ -22,7 +23,7 @@ public class UserDtoConverter implements Converter<String, UserDTO> {
             return null;
         }
 
-        return userService.findById(source);
+        return userService.findByUserName(source);
 
     }
 
