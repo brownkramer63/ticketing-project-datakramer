@@ -1,5 +1,6 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.UserDTO;
 import com.cydeo.mapper.RoleMapper;
 import com.cydeo.repository.RoleRepository;
 import com.cydeo.dto.RoleDTO;
@@ -39,6 +40,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDTO findById(Long id) {
-        return null;
+        return roleMapper.convertToDto(roleRepository.findById(id).get());
     }
+
+
+
 }
