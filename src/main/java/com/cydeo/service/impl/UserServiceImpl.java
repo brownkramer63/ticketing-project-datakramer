@@ -46,8 +46,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userMapper.convertToEntity(user));
     }
 
+    //will not use this method or will delete the user data
     @Override
     public void deleteByUserName(String username) {
+
     userRepository.deleteByUserName(username);
     }
 
@@ -64,7 +66,14 @@ public class UserServiceImpl implements UserService {
         return findByUserName(user.getUserName());
 
 
-
-
+    }
+//will not delete in database but will in ui
+    @Override
+    public void delete(String username) {
+     //go to DB and get that user with username set condition to true for is deleted
+     //save the object in DB
+     User user = userRepository.findByUserName(username);
+     user.setIsDeleted(true);
+     userRepository.save(user);
     }
 }
