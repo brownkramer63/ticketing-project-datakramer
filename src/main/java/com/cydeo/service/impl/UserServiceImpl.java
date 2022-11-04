@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> listAllUsers() {
         //we just need find all by the sort by will make it fancy
-
+//updating this for our delete method
         List<User> userList = userRepository.findAll(Sort.by("firstName"));
 
 
