@@ -44,7 +44,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDTO update(TaskDTO taskDTO) {
+    public void update(TaskDTO taskDTO) {
         Optional<Task> updatetask = taskRepository.findById(taskDTO.getId());
         Task convertedTask = taskMapper.convertToEntity(taskDTO);
 
@@ -53,8 +53,7 @@ public class TaskServiceImpl implements TaskService {
           convertedTask.setAssignedDate(updatetask.get().getAssignedDate());
           taskRepository.save(convertedTask);
         }
-        //check here if error and delete null
-        return null;
+
     }
 
     @Override
