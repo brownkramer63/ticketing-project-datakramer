@@ -45,7 +45,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectDTO> listAllProjects() {
         List<Project> projectList = projectRepository.findAll();
 
-      return projectList.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
+        return projectList.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
 
     }
 
@@ -59,25 +59,32 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void update(ProjectDTO dto) {
-Project project = projectRepository.findByProjectCode(dto.getProjectCode());
-Project convertedProject = projectMapper.convertToEntity(dto);
-convertedProject.setId(project.getId());
-convertedProject.setProjectStatus(project.getProjectStatus());
+        Project project = projectRepository.findByProjectCode(dto.getProjectCode());
+        Project convertedProject = projectMapper.convertToEntity(dto);
+        convertedProject.setId(project.getId());
+        convertedProject.setProjectStatus(project.getProjectStatus());
 
-projectRepository.save(convertedProject);
+        projectRepository.save(convertedProject);
     }
 
     @Override
     public void delete(String code) {
-Project project = projectRepository.findByProjectCode(code);
-project.setIsDeleted(true);
-projectRepository.save(project);
+
+        Project project = projectRepository.findByProjectCode(code);
+        project.setIsDeleted(true);
+        //after it is deleted it will add in the id to the end of the project code
+        //we would use this so we can reuse the projectcode and still have the old copy saved in DB
+        project.setProjectCode(project.getProjectCode() + "-" + project.getId());
+
+        projectRepository.save(project);
+
+        taskService.deleteByProject(projectMapper.convertToDto(project));
 
     }
 
     @Override
     public void complete(String projectCode) {
-        Project project= projectRepository.findByProjectCode(projectCode);
+        Project project = projectRepository.findByProjectCode(projectCode);
         project.setProjectStatus(Status.COMPLETE);
         projectRepository.save(project);
     }
@@ -94,7 +101,6 @@ projectRepository.save(project);
         List<Project> list = projectRepository.findProjectsByAssignedManager(user);
 
 
-
         return list.stream().map(project -> {
 
                     ProjectDTO obj = projectMapper.convertToDto(project);
@@ -107,6 +113,6 @@ projectRepository.save(project);
 
         ).collect(Collectors.toList());
     }
-    }
+}
 
 
