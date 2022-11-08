@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> listAllUsers() {
         //we just need find all by the sort by will make it fancy
 //updating this for our delete method
-        List<User> userList = userRepository.findAll(Sort.by("firstName"));
+        List<User> userList = userRepository.findAllByIsDeletedOrderByFirstNameDesc(false);
 
 
 
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findByUserName(String username) {
-        return userMapper.convertToDto(userRepository.findByUserName(username));
+        return userMapper.convertToDto(userRepository.findByUserNameAndIsDeleted(username,false));
     }
 
     @Override
@@ -80,10 +80,11 @@ public class UserServiceImpl implements UserService {
     public void delete(String username) {
      //go to DB and get that user with username set condition to true for is deleted
      //save the object in DB
-     User user = userRepository.findByUserName(username);
+     User user = userRepository.findByUserNameAndIsDeleted(username,false);
 
      if (checkIfUserCanBeDeleted(user)){
          user.setIsDeleted(true);
+         user.setUserName(user.getUserName() + "-"+user.getId()); //to make the username unique in DB when we soft delete
          userRepository.save(user);
      }
 
