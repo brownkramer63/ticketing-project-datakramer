@@ -41,7 +41,7 @@ public class ProjectController {
         if (bindingResult.hasErrors()) {
 
             model.addAttribute("managers", userService.listAllByRole("manager"));
-            model.addAttribute("projects", projectService.listAllProjects());
+            model.addAttribute("projects", projectService.listAllProjectDetails());
 
             return "/project/create";
 
@@ -70,7 +70,7 @@ public class ProjectController {
 
         model.addAttribute("project", projectService.getByProjectCode(projectCode));
         model.addAttribute("managers", userService.listAllByRole("manager"));
-        model.addAttribute("projects", projectService.listAllProjects());
+        model.addAttribute("projects", projectService.listAllProjectDetails());
 
         return "/project/update";
 
@@ -82,7 +82,8 @@ public class ProjectController {
         if (bindingResult.hasErrors()) {
 
             model.addAttribute("managers", userService.listAllByRole("manager"));
-            model.addAttribute("projects", projectService.listAllProjects());
+            model.addAttribute("projects", projectService.listAllProjectDetails());
+
             return "/project/update";
 
         }
@@ -92,7 +93,6 @@ public class ProjectController {
         return "redirect:/project/create";
 
     }
-
     @GetMapping("/manager/project-status")
     public String getProjectByManager(Model model) {
 

@@ -11,6 +11,7 @@ import com.cydeo.repository.ProjectRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,9 +44,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDTO> listAllProjects() {
-        List<Project> projectList = projectRepository.findAll();
+        List<Project> list = projectRepository.findAll(Sort.by("projectCode"));
 
-        return projectList.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
+        return list.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
 
     }
 
@@ -69,16 +70,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void delete(String code) {
-
-        Project project = projectRepository.findByProjectCode(code);
-        project.setIsDeleted(true);
         //after it is deleted it will add in the id to the end of the project code
         //we would use this so we can reuse the projectcode and still have the old copy saved in DB
-        project.setProjectCode(project.getProjectCode() + "-" + project.getId());
+        Project project = projectRepository.findByProjectCode(code);
+        project.setIsDeleted(true);
+
+        project.setProjectCode(project.getProjectCode() + "-" + project.getId());  // SP03-4
 
         projectRepository.save(project);
 
         taskService.deleteByProject(projectMapper.convertToDto(project));
+
 
     }
 
@@ -87,20 +89,17 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findByProjectCode(projectCode);
         project.setProjectStatus(Status.COMPLETE);
         projectRepository.save(project);
-        //could be bug here
+
         taskService.completeByProject(projectMapper.convertToDto(project));
     }
 
     @Override
     public List<ProjectDTO> listAllProjectDetails() {
 
-        //we will add this part later with security
         UserDTO currentUserDTO = userService.findByUserName("harold@manager.com");
-        //took dto object by username then we converted it to entity
         User user = userMapper.convertToEntity(currentUserDTO);
-        //now we will retrieve all projects assigned to the manager login above
-        //we made the below method in project repository
-        List<Project> list = projectRepository.findProjectsByAssignedManager(user);
+
+        List<Project> list = projectRepository.findAllByAssignedManager(user);
 
 
         return list.stream().map(project -> {

@@ -37,15 +37,13 @@ public class UserServiceImpl implements UserService {
         //we just need find all by the sort by will make it fancy
 //updating this for our delete method
         List<User> userList = userRepository.findAllByIsDeletedOrderByFirstNameDesc(false);
-
-
-
         return userList.stream().map(userMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
     public UserDTO findByUserName(String username) {
-        return userMapper.convertToDto(userRepository.findByUserNameAndIsDeleted(username,false));
+        User user = userRepository.findByUserNameAndIsDeleted(username, false);
+        return userMapper.convertToDto(user);
     }
 
     @Override
@@ -54,7 +52,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userMapper.convertToEntity(user));
     }
 
-    //will not use this method or will delete the user data
+//    will not use this method or will delete the user data
     @Override
     public void deleteByUserName(String username) {
 
@@ -63,15 +61,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO update(UserDTO user) {
-        //need to find the current user
-        User user1 = userRepository.findByUserName((user.getUserName())); //has id
-        //map update user dto to entity object
-        User convertedUser= userMapper.convertToEntity(user);// has no id
-        //set id to the converted entity
+        //Find current user
+        User user1 = userRepository.findByUserNameAndIsDeleted(user.getUserName(), false);  //has id
+        //Map update user dto to entity object
+        User convertedUser = userMapper.convertToEntity(user);   // has id?
+        //set id to the converted object
         convertedUser.setId(user1.getId());
         //save the updated user in the db
         userRepository.save(convertedUser);
+
         return findByUserName(user.getUserName());
+
 
 
     }
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
      if (checkIfUserCanBeDeleted(user)){
          user.setIsDeleted(true);
-         user.setUserName(user.getUserName() + "-"+user.getId()); //to make the username unique in DB when we soft delete
+         user.setUserName(user.getUserName() + "-" +user.getId()); //to make the username unique in DB when we soft delete
          userRepository.save(user);
      }
 
@@ -93,24 +93,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> listAllByRole(String role) {
 
-     List<User> users = userRepository.findByRoleDescriptionIgnoreCase(role);
-
-     return users.stream().map(userMapper::convertToDto).collect(Collectors.toList());
+        List<User> users = userRepository.findByRoleDescriptionIgnoreCaseAndIsDeleted(role, false);
+        return users.stream().map(userMapper::convertToDto).collect(Collectors.toList());
     }
 
     private boolean checkIfUserCanBeDeleted(User user){
-        switch (user.getRole().getDescription()){
-
+        switch (user.getRole().getDescription()) {
             case "Manager":
                 List<ProjectDTO> projectDTOList = projectService.listAllNonCompletedByAssignedManager(userMapper.convertToDto(user));
-           return projectDTOList.size()==0;
-
-
+                return projectDTOList.size() == 0;
             case "Employee":
                 List<TaskDTO> taskDTOList = taskService.listAllNonCompletedByAssignedEmployee(userMapper.convertToDto(user));
-                return taskDTOList.size()==0;
-
-            default: return true;
+                return taskDTOList.size() == 0;
+            default:
+                return true;
 
         }
 
