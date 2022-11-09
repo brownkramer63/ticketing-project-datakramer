@@ -12,10 +12,9 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Tasks")
+@Table(name = "tasks")
 @Where(clause = "is_deleted=false")
 public class Task extends BaseEntity{
 
