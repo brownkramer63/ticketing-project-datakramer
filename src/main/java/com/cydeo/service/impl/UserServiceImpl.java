@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
     }
 
 //    will not use this method or will delete the user data
-    @Override
-    public void deleteByUserName(String username) {
-
-    userRepository.deleteByUserName(username);
-    }
+//    @Override
+//    public void deleteByUserName(String username) {
+//
+//    userRepository.deleteByUserName(username);
+//    }
 
     @Override
     public UserDTO update(UserDTO user) {
